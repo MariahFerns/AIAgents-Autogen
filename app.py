@@ -110,6 +110,7 @@ with st.form('myform', clear_on_submit=True):
       del api_key
 
   if len(result):
+    messages = []
     for message in response.messages:
             if message not in messages:
                 messages.append(message["name"] + ": " + message["content"])
