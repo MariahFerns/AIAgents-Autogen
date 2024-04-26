@@ -76,12 +76,7 @@ def get_blogpost(api_key):
         ]
     )
 
-    messages = []
-    for message in chat_results.messages:
-        if message not in messages:
-            messages.append(message["name"] + ": " + message["content"])
-            st.session_state.messages = messages
-            st.write(message["name"] + ": " + message["content"])
+    return chat_results
 
 
 
@@ -111,11 +106,12 @@ with st.form('myform', clear_on_submit=True):
   # check if submit is clicked and api key is valid
   if (submit and api_key.startswith('sk-')):
     with st.spinner('Processing...'):
-      get_blogpost(api_key)
-      # result.append(response)
+      response = get_blogpost(api_key)
+      result.append(response)
       del api_key
 
-  # if len(result):
+  if len(result):
+      st.markdown(response)
     
 
 
