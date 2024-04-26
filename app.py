@@ -76,7 +76,7 @@ def get_blogpost(api_key):
         ]
     )
 
-return chat_results
+    return chat_results
 
 
 
