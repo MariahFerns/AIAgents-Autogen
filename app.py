@@ -93,4 +93,22 @@ The report gives you a quick gist of important information without you having to
 put together the same information from multiple sources and websites.
 ''')
 
+# Form to take API key and get the response
+result=[]
+with st.form('myform', clear_on_submit=True):
+  # get api key
+  api_key = st.text_input('Enter OpenAI API Key:', type='password')
+  # create submit button
+  submit = st.form_submit_button('Submit')
+  # check if submit is clicked and api key is valid
+  if (submit and api_key.startswith('sk-')):
+    with st.spinner('Processing...'):
+      response = get_blogpost(api_key)
+      resulti.append(response)
+      del api_key
+
+  if len(result):
+    st.write(response)
+
+
 
