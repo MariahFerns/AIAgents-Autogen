@@ -76,6 +76,8 @@ def get_blogpost(api_key):
         ]
     )
 
+return chat_results
+
 
 
 # Create the Streamlit UI
@@ -108,7 +110,11 @@ with st.form('myform', clear_on_submit=True):
       del api_key
 
   if len(result):
-    st.write(response)
+    for message in response.messages:
+            if message not in messages:
+                messages.append(message["name"] + ": " + message["content"])
+                st.session_state.messages = messages
+                st.write(message["name"] + ": " + message["content"])
 
 
 
