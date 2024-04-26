@@ -1,118 +1,141 @@
-import autogen
+class TrackableAssistantAgent1(AssistantAgent):
+    def _process_received_message(self, message, sender, silent):
+        with st.chat_message(sender.name):
+            output = message["name"] + ": " + message["content"]
+            st.markdown(output)
+        return super()._process_received_message(message, sender, silent)
 
+class TrackableAssistantAgent2(AssistantAgent):
+    def _process_received_message(self, message, sender, silent):
+        with st.chat_message(sender.name):
+            output = message["name"] + ": " + message["content"]
+            st.markdown(output)
+        return super()._process_received_message(message, sender, silent)
 
-def get_blogpost(api_key):
-
-    config_list = [{"model": "gpt-4", "api_key": api_key}]
-    llm_config = {'config_list':config_list}
+class TrackableAssistantAgent3(AssistantAgent):
+    def _process_received_message(self, message, sender, silent):
+        with st.chat_message(sender.name):
+            output = message["name"] + ": " + message["content"]
+            st.markdown(output)
+        return super()._process_received_message(message, sender, silent)
     
-    # Create the tasks
+class TrackableAssistantAgent4(AssistantAgent):
+    def _process_received_message(self, message, sender, silent):
+        with st.chat_message(sender.name):
+            output = message["name"] + ": " + message["content"]
+            st.markdown(output)
+        return super()._process_received_message(message, sender, silent)
+
+
+class TrackableUserProxyAgent(UserProxyAgent):
+    def _process_received_message(self, message, sender, silent):
+        with st.chat_message(sender.name):
+            output = message["name"] + ": " + message["content"]
+            st.markdown(output)
+        return super()._process_received_message(message, sender, silent) 
+      
+with st.form("my_form"):
+    st.write("Fill the following information about your group meeting. Then, click submit.")
+        
+    #User Proxy Agent
+    system_message0 = st.text_area("Chairman of the meeting", height=300,
+                                   placeholder = '''Enter detailed information about yourself as the Chairman of this group meeting''')
+    user_proxy = TrackableUserProxyAgent(name="Admin", 
+                                system_message = system_message0, 
+                                code_execution_config=False,
+                                llm_config=llm_config1,
+                                human_input_mode='NEVER' 
+                                )
     
-    financial_tasks = [
-        'What are the current stock prices of NVIDIA and TESLA? How is the performance over the past month in terms of percentage change?',
-        'Investigate possible reasons of the stock performance'
-    ]
-    
-    writing_tasks = [
-        'Write an engaging blog post using the information provided to you.'
-    ]
-    
-    # Create the agents
-    
-    financial_assistant = autogen.AssistantAgent(
-        name = 'Financial_Assistant',
-        llm_config = llm_config
-    )
-    
-    research_assistant= autogen.AssistantAgent(
-        name = 'Researcher',
-        llm_config = llm_config
-    )
-    
-    writer = autogen.AssistantAgent(
-        name = 'writer',
-        llm_config = llm_config,
-        system_message = '''
-            You are a professional writer, known for you insightful
-            and engaging articles.
-            You transform complex concepts into compelling narratives.
-            Print 'TERMINATE' at the end when evertything is done.
-        '''
-    )
+    #Assistant Agent 1
+    agent1_role = st.text_input("Agent One", placeholder = "Enter agent one's role in this meeting with  no spaces e.g. Research_Analyst")
+    system_message1 = st.text_area("Agent One's instructions", height=300,
+                                   placeholder = '''Example (replace with your own):''')
+    agent1 = TrackableAssistantAgent1(name=agent1_role, 
+                                     llm_config=llm_config1, 
+                                     system_message=system_message1)
     
     
-    user = autogen.UserProxyAgent(
-        name = 'User',
-        human_input_mode = 'NEVER',
-        is_termination_msg = lambda x: x.get('content','') and x.get('content','').rstrip().endswith('TERMINATE'),
-        code_execution_config = {
-            'last_n_messages': 1,
-            'work_dir': 'tasks',
-            'use_docker': False
-        }
-    )
+    #Assistant Agent 2
+    agent2_role = st.text_input("Agent Two", placeholder = "Enter agent two's role in this meeting with no spaces e.g. Portfolio_Manager")
+    system_message2 = st.text_area("Agent Two's instructions", height=300, 
+                                   placeholder = '''Example (replace with your own): ''')
+    agent2 = TrackableAssistantAgent2(name=agent2_role, 
+                                     llm_config=llm_config1, 
+                                     system_message=system_message2)
     
-    # Initiate the chat
+    #Assistant Agent 3
+    agent3_role = st.text_input("Agent Three", placeholder = "Enter agent three's role in this meeting with no spaces e.g. Risk_analyst")
+    system_message3 = st.text_area("Agent Three's instructions", height=300, 
+                                   placeholder = '''Example (replace with your own): ''')
+    agent3 = TrackableAssistantAgent3(name=agent3_role, 
+                                     llm_config=llm_config1, 
+                                     system_message=system_message3)
     
-    chat_results = user.initiate_chats(
-        [
-            {
-                'recipient': financial_assistant,
-                'message': financial_tasks[0], # pass 1st task to financial assistant
-                'clear_history': True,
-                'silent': False,
-                'summary_method': 'last_msg',
-            },
-            {
-                'recipient': research_assistant,
-                'message': financial_tasks[1], # pass 2nd task to research assistant
-                'summary_method': 'reflection_with_llm',
-            },
-            {
-                'recipient': writer,
-                'message': writing_tasks[0],
-                'carryover': 'I want to include a figure or a table of data in the blog post.',
-            },
-        ]
-    )
-
-    return chat_results
-
-
-
-
-# Create the Streamlit UI
-
-import streamlit as st
-
-st.title('🔖Using AI agents for Stock Market Analysis')
-
-st.header('About the App')
-st.write('''
-This app helps you automate stock market research using AI agents.
-These agents scrapes the web and perform research on sites like Yahoo Finance and Google news websites to 
-fetch you the latest updates regarding a particular stock.
-The report gives you a quick gist of important information without you having to spend hours to 
-put together the same information from multiple sources and websites.
-''')
-
-# Form to take API key and get the response
-result=[]
-with st.form('myform', clear_on_submit=True):
-  # get api key
-  api_key = st.text_input('Enter OpenAI API Key:', type='password')
-  # create submit button
-  submit = st.form_submit_button('Submit')
-  # check if submit is clicked and api key is valid
-  if (submit and api_key.startswith('sk-')):
-    with st.spinner('Processing...'):
-      response = get_blogpost(api_key)
-      result.append(response)
-      del api_key
-
-  if len(result):
-      st.markdown(response)
+    #Assistant Agent 4
+    agent4_role = st.text_input("Agent Four", placeholder = "Enter agent four's role in this meeting with no spaces e.g. Marketing_Manager")
+    system_message4 = st.text_area("Agent Four's instructions", height=300,
+                                   placeholder = '''Example (replace with your own): ''')
+    agent4 = TrackableAssistantAgent4(name=agent4_role, 
+                                     llm_config=llm_config1, 
+                                     system_message=system_message4)
     
-
-
-
+    #submit button
+    submitted = st.form_submit_button("Submit")
+    if submitted:
+        st.session_state.agent1_role = agent1_role
+        st.session_state.agent2_role = agent2_role
+        st.session_state.agent3_role = agent3_role
+        st.session_state.agent4_role = agent4_role
+        st.session_state.system_message1 = system_message1
+        st.session_state.system_message2 = system_message2
+        st.session_state.system_message3 = system_message3
+        st.session_state.system_message4 = system_message4
+        st.session_state.system_message0 = system_message0
+        #st.write("info submitted. Type a greeting message below to start the meeting.")
+        #print("info submitted")
+        #st.experimental_rerun()
+        #print("rerun")
+        #st.container.empty()
+        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+user_input = st.chat_input("Start the meeting with a greeting message. e.g. Hello everyone, welcome to the meeting.") 
+ 
+groupchat = GroupChat(
+        agents=[user_proxy, agent1, agent2, agent3, agent4], 
+        messages=[], max_round=50)
+partner = GroupChatManager(groupchat=groupchat, llm_config=llm_config1)
+  
+if user_input: 
+    
+    # Create an event loop
+    #loop = asyncio.new_event_loop()
+    #asyncio.set_event_loop(loop)
+    
+    #Define aynchronous function
+    async def initiate_chat():
+        chat_messages = user_proxy.a_initiate_chat(
+            partner,
+            message=user_input,
+            llm_config = llm_config1
+        )
+        await chat_messages
+        print("Console Log" + chat_messages)
+        messages = []
+        for message in chat_messages.messages:
+            if message not in messages:
+                messages.append(message["name"] + ": " + message["content"])
+                st.session_state.messages = messages
+                st.write(message["name"] + ": " + message["content"])
+            #return chat_messages
+    
+    #Run the asynchronous function
+    asyncio.run(initiate_chat())
