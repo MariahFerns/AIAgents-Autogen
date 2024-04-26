@@ -1,3 +1,5 @@
+import autogen
+
 class TrackableAssistantAgent1(AssistantAgent):
     def _process_received_message(self, message, sender, silent):
         with st.chat_message(sender.name):
