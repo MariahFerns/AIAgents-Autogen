@@ -26,8 +26,7 @@ def get_blogpost(api_key):
     
     research_assistant= autogen.AssistantAgent(
         name = 'Researcher',
-        llm_config = llm_config,
-        system_message = 'Do not spend time researching any sites that require creation of an API key. Use free resources only.'
+        llm_config = llm_config
     )
     
     writer = autogen.AssistantAgent(
