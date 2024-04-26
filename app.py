@@ -88,6 +88,11 @@ with st.container():
             human_input_mode="NEVER",
             llm_config=llm_config,
             is_termination_msg=lambda x: x.get("content", "").strip().endswith("TERMINATE"),
+            code_execution_config = {
+            'last_n_messages': 1,
+            'work_dir': 'tasks',
+            'use_docker': False
+        }
         )
 
         # Create an event loop: this is needed to run asynchronous functions
