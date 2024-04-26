@@ -5,4 +5,4 @@ The report gives you a quick gist of important information without you having to
 
 
 
-Note: Since the agents execute Python scripts and use 35r party API's to fetche information, this app has not been hosted on Streamlit as streamlit doe not support it. This is a limitation of Streamlit and not of Autogen.
+Note: Since the agents execute Python scripts and use 3rd party API's to fetch information, this app has not been hosted on Streamlit as Streamlit does not support it. This is a limitation of Streamlit and not of Autogen.
