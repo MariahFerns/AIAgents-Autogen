@@ -82,12 +82,12 @@ def get_blogpost(api_key):
 
 import streamlit as st
 
-st.title('🔖Using AI agents for Stock Analysis')
+st.title('🔖Using AI agents for Stock Market Analysis')
 
 st.header('About the App')
 st.write('''
 This app helps you automate stock market research using AI agents.
-These agents scour the web and perform research on sites like Yahoo Finance and news websites to 
+These agents scrapes the web and perform research on sites like Yahoo Finance and Google news websites to 
 fetch you the latest updates regarding a particular stock.
 The report gives you a quick gist of important information without you having to spend hours to 
 put together the same information from multiple sources and websites.
@@ -104,11 +104,12 @@ with st.form('myform', clear_on_submit=True):
   if (submit and api_key.startswith('sk-')):
     with st.spinner('Processing...'):
       response = get_blogpost(api_key)
-      resulti.append(response)
+      result.append(response)
       del api_key
 
   if len(result):
     st.write(response)
+
 
 
 
