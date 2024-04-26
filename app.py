@@ -1,143 +1,122 @@
-import autogen
+"""
+This is a demo of AutoGen chat agents. You can use it to chat with OpenAI's GPT-3 and GPT-4 models. They are able to execute commands, answer questions, and even write code.
+An example a question you can ask is: 'How is the S&P 500 doing today? Summarize the news for me.'
+UserProxyAgent is used to send messages to the AssistantAgent. The AssistantAgent is used to send messages to the UserProxyAgent.
 
-class TrackableAssistantAgent1(AssistantAgent):
-    def _process_received_message(self, message, sender, silent):
-        with st.chat_message(sender.name):
-            output = message["name"] + ": " + message["content"]
-            st.markdown(output)
-        return super()._process_received_message(message, sender, silent)
+"""
 
-class TrackableAssistantAgent2(AssistantAgent):
-    def _process_received_message(self, message, sender, silent):
-        with st.chat_message(sender.name):
-            output = message["name"] + ": " + message["content"]
-            st.markdown(output)
-        return super()._process_received_message(message, sender, silent)
 
-class TrackableAssistantAgent3(AssistantAgent):
+import streamlit as st
+import asyncio
+from autogen import AssistantAgent, UserProxyAgent
+
+# setup page title and description
+st.set_page_config(page_title="AutoGen Chat app", page_icon="🤖", layout="wide")
+
+st.markdown("Adapted from [this example](https://github.com/sugarforever/autogen-streamlit)")
+st.markdown(
+    "This is a demo of AutoGen chat agents. You can use it to chat with OpenAI's GPT-3 and GPT-4 models. They are able to execute commands, answer questions, and even write code."
+)
+st.markdown("An example a question you can ask is: 'How is the S&P 500 doing today? Summarize the news for me.'")
+st.markdown("Start by getting an API key from OpenAI. You can get one [here](https://openai.com/pricing).")
+
+
+class TrackableAssistantAgent(AssistantAgent):
+    """
+    A custom AssistantAgent that tracks the messages it receives.
+
+    This is done by overriding the `_process_received_message` method.
+    """
+
     def _process_received_message(self, message, sender, silent):
         with st.chat_message(sender.name):
-            output = message["name"] + ": " + message["content"]
-            st.markdown(output)
-        return super()._process_received_message(message, sender, silent)
-    
-class TrackableAssistantAgent4(AssistantAgent):
-    def _process_received_message(self, message, sender, silent):
-        with st.chat_message(sender.name):
-            output = message["name"] + ": " + message["content"]
-            st.markdown(output)
+            st.markdown(message)
         return super()._process_received_message(message, sender, silent)
 
 
 class TrackableUserProxyAgent(UserProxyAgent):
+    """
+    A custom UserProxyAgent that tracks the messages it receives.
+
+    This is done by overriding the `_process_received_message` method.
+    """
+
     def _process_received_message(self, message, sender, silent):
         with st.chat_message(sender.name):
-            output = message["name"] + ": " + message["content"]
-            st.markdown(output)
-        return super()._process_received_message(message, sender, silent) 
-      
-with st.form("my_form"):
-    st.write("Fill the following information about your group meeting. Then, click submit.")
-        
-    #User Proxy Agent
-    system_message0 = st.text_area("Chairman of the meeting", height=300,
-                                   placeholder = '''Enter detailed information about yourself as the Chairman of this group meeting''')
-    user_proxy = TrackableUserProxyAgent(name="Admin", 
-                                system_message = system_message0, 
-                                code_execution_config=False,
-                                llm_config=llm_config1,
-                                human_input_mode='NEVER' 
-                                )
-    
-    #Assistant Agent 1
-    agent1_role = st.text_input("Agent One", placeholder = "Enter agent one's role in this meeting with  no spaces e.g. Research_Analyst")
-    system_message1 = st.text_area("Agent One's instructions", height=300,
-                                   placeholder = '''Example (replace with your own):''')
-    agent1 = TrackableAssistantAgent1(name=agent1_role, 
-                                     llm_config=llm_config1, 
-                                     system_message=system_message1)
-    
-    
-    #Assistant Agent 2
-    agent2_role = st.text_input("Agent Two", placeholder = "Enter agent two's role in this meeting with no spaces e.g. Portfolio_Manager")
-    system_message2 = st.text_area("Agent Two's instructions", height=300, 
-                                   placeholder = '''Example (replace with your own): ''')
-    agent2 = TrackableAssistantAgent2(name=agent2_role, 
-                                     llm_config=llm_config1, 
-                                     system_message=system_message2)
-    
-    #Assistant Agent 3
-    agent3_role = st.text_input("Agent Three", placeholder = "Enter agent three's role in this meeting with no spaces e.g. Risk_analyst")
-    system_message3 = st.text_area("Agent Three's instructions", height=300, 
-                                   placeholder = '''Example (replace with your own): ''')
-    agent3 = TrackableAssistantAgent3(name=agent3_role, 
-                                     llm_config=llm_config1, 
-                                     system_message=system_message3)
-    
-    #Assistant Agent 4
-    agent4_role = st.text_input("Agent Four", placeholder = "Enter agent four's role in this meeting with no spaces e.g. Marketing_Manager")
-    system_message4 = st.text_area("Agent Four's instructions", height=300,
-                                   placeholder = '''Example (replace with your own): ''')
-    agent4 = TrackableAssistantAgent4(name=agent4_role, 
-                                     llm_config=llm_config1, 
-                                     system_message=system_message4)
-    
-    #submit button
-    submitted = st.form_submit_button("Submit")
-    if submitted:
-        st.session_state.agent1_role = agent1_role
-        st.session_state.agent2_role = agent2_role
-        st.session_state.agent3_role = agent3_role
-        st.session_state.agent4_role = agent4_role
-        st.session_state.system_message1 = system_message1
-        st.session_state.system_message2 = system_message2
-        st.session_state.system_message3 = system_message3
-        st.session_state.system_message4 = system_message4
-        st.session_state.system_message0 = system_message0
-        #st.write("info submitted. Type a greeting message below to start the meeting.")
-        #print("info submitted")
-        #st.experimental_rerun()
-        #print("rerun")
-        #st.container.empty()
-        
- 
- 
- 
- 
- 
- 
- 
- 
- 
-user_input = st.chat_input("Start the meeting with a greeting message. e.g. Hello everyone, welcome to the meeting.") 
- 
-groupchat = GroupChat(
-        agents=[user_proxy, agent1, agent2, agent3, agent4], 
-        messages=[], max_round=50)
-partner = GroupChatManager(groupchat=groupchat, llm_config=llm_config1)
-  
-if user_input: 
-    
-    # Create an event loop
-    #loop = asyncio.new_event_loop()
-    #asyncio.set_event_loop(loop)
-    
-    #Define aynchronous function
-    async def initiate_chat():
-        chat_messages = user_proxy.a_initiate_chat(
-            partner,
-            message=user_input,
-            llm_config = llm_config1
+            st.markdown(message)
+        return super()._process_received_message(message, sender, silent)
+
+
+# add placeholders for selected model and key
+selected_model = None
+selected_key = None
+
+# setup sidebar: models to choose from and API key input
+with st.sidebar:
+    st.header("OpenAI Configuration")
+    selected_model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4-1106-preview"], index=1)
+    st.markdown("Press enter to save key")
+    st.markdown(
+        "For more information about the models, see [here](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)."
+    )
+    selected_key = st.text_input("API Key", type="password")
+
+# setup main area: user input and chat messages
+with st.container():
+    user_input = st.text_input("User Input")
+    # only run if user input is not empty and model and key are selected
+    if user_input:
+        if not selected_key or not selected_model:
+            st.warning("You must provide valid OpenAI API key and choose preferred model", icon="⚠️")
+            st.stop()
+        # setup request timeout and config list
+        llm_config = {
+            "request_timeout": 600,
+            "config_list": [
+                {"model": selected_model, "api_key": selected_key},
+            ],
+            "seed": "42",  # seed for reproducibility
+            "temperature": 0,  # temperature of 0 means deterministic output
+        }
+        # create an AssistantAgent instance named "assistant"
+        assistant = TrackableAssistantAgent(name="assistant", llm_config=llm_config)
+
+        # create a UserProxyAgent instance named "user"
+        # human_input_mode is set to "NEVER" to prevent the agent from asking for user input
+        user_proxy = TrackableUserProxyAgent(
+            name="user",
+            human_input_mode="NEVER",
+            llm_config=llm_config,
+            is_termination_msg=lambda x: x.get("content", "").strip().endswith("TERMINATE"),
         )
-        await chat_messages
-        print("Console Log" + chat_messages)
-        messages = []
-        for message in chat_messages.messages:
-            if message not in messages:
-                messages.append(message["name"] + ": " + message["content"])
-                st.session_state.messages = messages
-                st.write(message["name"] + ": " + message["content"])
-            #return chat_messages
-    
-    #Run the asynchronous function
-    asyncio.run(initiate_chat())
+
+        # Create an event loop: this is needed to run asynchronous functions
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        # Define an asynchronous function: this is needed to use await
+        if "chat_initiated" not in st.session_state:
+            st.session_state.chat_initiated = False  # Initialize the session state
+
+        if not st.session_state.chat_initiated:
+
+            async def initiate_chat():
+                await user_proxy.a_initiate_chat(
+                    assistant,
+                    message=user_input,
+                    max_consecutive_auto_reply=5,
+                    is_termination_msg=lambda x: x.get("content", "").strip().endswith("TERMINATE"),
+                )
+                st.stop()  # Stop code execution after termination command
+
+            # Run the asynchronous function within the event loop
+            loop.run_until_complete(initiate_chat())
+
+            # Close the event loop
+            loop.close()
+
+            st.session_state.chat_initiated = True  # Set the state to True after running the chat
+
+
+# stop app after termination command
+st.stop()
