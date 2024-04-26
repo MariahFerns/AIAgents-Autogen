@@ -76,8 +76,8 @@ def get_blogpost(api_key):
         ]
     )
 
-	messages = []
-	for message in chat_results.messages:
+    messages = []
+    for message in chat_results.messages:
         if message not in messages:
             messages.append(message["name"] + ": " + message["content"])
             st.session_state.messages = messages
